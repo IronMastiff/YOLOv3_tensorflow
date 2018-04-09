@@ -88,10 +88,6 @@ def feature_extractor( inputs ):
         layer = Res_conv2d( layer, 1024, [3, 3] )
         layer = Res( layer, shortcut )
 
-    # avg_pool = tf.nn.avg_pool( layer, [1, 1, 1, 1], [1, 1, 1, 1], padding = 'SAME' )
-    # fc = tf.layers.dense( avg_pool, 1000 )
-    # softmax = tf.nn.softmax( fc )
-
     return layer
 
 '''--------Test the net--------'''
