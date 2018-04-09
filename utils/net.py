@@ -14,7 +14,7 @@ def conv2d( inputs, filters, shape, stride = ( 1, 1 ) ):
                               shape,
                               stride,
                               padding = 'SAME',
-                              kernel_initializer=tf.truncated_normal_initializer(stddev=0.01) )
+                              kernel_initializer=tf.truncated_normal_initializer( stddev=0.01 ) )
 
     layer = tf.layers.batch_normalization( layer, training = True )
 
