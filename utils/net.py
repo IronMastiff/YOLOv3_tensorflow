@@ -1,8 +1,5 @@
-from utils import extract_labels
-import tensorflow as tf
-import numpy as np
 import cv2
-import matplotlib.pyplot as plt
+import tensorflow as tf
 
 
 def Leaky_Relu( input, alpha = 0.01 ):
@@ -104,5 +101,3 @@ if __name__ == "__main__":
         sess.run( tf.initialize_all_variables() )
 
         print( sess.run( layer ).shape )
-
-
