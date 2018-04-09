@@ -38,13 +38,12 @@ def Res_conv2d( inputs, filters, shape, stride = ( 1, 1 ) ):
 
     return layer
 
+
 def Res( input, shortcut ):
 
     layer = Leaky_Relu( tf.add( input, shortcut ) )
 
     return layer
-
-
 
 
 def feature_extractor( inputs ):
