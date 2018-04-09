@@ -86,6 +86,11 @@ def feature_extractor( inputs ):
 
     return layer
 
+
+
+
+
+
 '''--------Test the extrctor--------'''
 if __name__ == "__main__":
     data = cv2.imread(  '../data/VOCtest_06-Nov-2007/JPEGImages/000001.jpg' )
