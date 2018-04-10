@@ -1,1 +1,13 @@
+## Batch size
 batch_size: 5
+
+## Target image size
+height: 512
+width: 512
+
+## The scale size that the net work output.
+scale: 1
+
+## Path
+datas_path: './data/VOCtrain_06-Nov-2007/JPGEImage'
+labels_path: './data/VOCtrain_06-Nov-2007/Annotations'
