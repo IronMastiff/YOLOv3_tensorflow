@@ -4,6 +4,8 @@ import cv2
 from os.path import isfile, join
 from os import listdir
 
+
+'''--------Here fnish the minibatch operation--------'''
 def image( batch_size, path ):
     filenames = [join( path, f ) for f in listdir( path ) if isfile( join( path, f ) )]
 
