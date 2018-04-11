@@ -5,7 +5,7 @@ import skimage.transform
 
 def create_placeholder( width, height ):
     X = tf.placeholder( tf.float32, [None, widht, height, 3] )
-    Y = tf.placeholder( tf.float32, [None, 255] )
+    Y = tf.placeholder( tf.float32, [None, final_widht, final_height, 255] )
 
 def Leaky_Relu( input, alpha = 0.01 ):
     output = tf.maximum( input, tf.multiply( input, alpha ) )
