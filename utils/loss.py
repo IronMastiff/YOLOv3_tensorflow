@@ -58,19 +58,18 @@ def calculate_loss( batches_inputs, batches_labels ):
                                                       label_x,
                                                       label_y,
                                                       label_width,
-                                                       label_height )
+                                                      label_height )
 
                         loss = class_loss( pretect_class,
-                                                 label_class ) + location_loss( pretect_x,
-                                                                                pretect_y,
-                                                                                pretect_width,
-                                                                                pretect_height,
-                                                                                label_x,
-                                                                                label_y,
-                                                                                label_width,
-                                                                                label_height ) + objectness_loss( IOU,
-                                                                                                                  label_objectness )
+                                           label_class ) + location_loss( pretect_x,
+                                                                          pretect_y,
+                                                                          pretect_width,
+                                                                          pretect_height,
+                                                                          label_x,
+                                                                          label_y,
+                                                                          label_width,
+                                                                          label_height ) + objectness_loss( IOU, label_objectness )
 
-                     batch_loss += loss
+                        batch_loss += loss
 
     return batch_loss
