@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 from os.path import isfile, join
 from os import listdir
+from utils import extract_labels as extract_labels
 
 
 '''--------Here fnish the minibatch operation--------'''
@@ -29,6 +30,16 @@ def get_image( path, width, height ):
     image = cv2.resize( image, ( width, height ) )
 
     return image
+
+def labels( batch_size, path ):
+    batch_labels = []
+    labels_filenames = image( batch_size, path )
+    # for label_filename in labels_filenames:
+    #     batch_label = extract_labels.labels_normaliszer( label_filename )
+    #     batch_labels.append( batch_label )
+
+    return labels_filenames
+
 
 
 
