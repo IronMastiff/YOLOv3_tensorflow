@@ -1,6 +1,10 @@
 import cv2
 import tensorflow as tf
+import skimage.transform
 
+
+# def create_placeholder( width, height ):
+#     X =
 
 def Leaky_Relu( input, alpha = 0.01 ):
     output = tf.maximum( input, tf.multiply( input, alpha ) )
@@ -23,7 +27,7 @@ def conv2d( inputs, filters, shape, stride = ( 1, 1 ) ):
     return layer
 
 
-def Res_conv2d( inputs, filters, shape, stride = ( 1, 1 ) ):
+def no_activation_conv2d( inputs, filters, shape, stride = ( 1, 1 ) ):
     layer = tf.layers.conv2d( inputs,
                               filters,
                               shape,
@@ -35,12 +39,11 @@ def Res_conv2d( inputs, filters, shape, stride = ( 1, 1 ) ):
 
     return layer
 
+def Res_conv2d( inputs, shortcut, filters, shape, stride = ( 1, 1 ) ):
+    conv = conv2d( inputs, filters, shape )
+    Res = Leaky_Relu( conv + shortcut )
 
-def Res( input, shortcut ):
-
-    layer = Leaky_Relu( tf.add( input, shortcut ) )
-
-    return layer
+    return Res
 
 
 def feature_extractor( inputs ):
@@ -49,60 +52,101 @@ def feature_extractor( inputs ):
     shortcut = layer
 
     layer = conv2d( layer, 32, [1, 1] )
-    layer = Res_conv2d( layer, 64, [3, 3] )
-    layer = Res( layer, shortcut )
+    layer = Res_conv2d( layer, shortcut, 64, [3, 3] )
 
     layer = conv2d( layer, 128, [3, 3], ( 2, 2 ) )
     shortcut = layer
 
     for _ in range( 2 ):
         layer = conv2d( layer, 64, [1, 1] )
-        layer = Res_conv2d( layer, 128, [3, 3] )
-        layer = Res( layer, shortcut )
+        layer = Res_conv2d( layer, shortcut, 128, [3, 3] )
 
     layer = conv2d( layer, 256, [3, 3], ( 2, 2 ) )
     shortcut = layer
 
     for _ in range( 8 ):
         layer = conv2d( layer, 128, [1, 1] )
-        layer = Res_conv2d( layer, 256, [3, 3] )
-        layer = Res( layer, shortcut )
+        layer = Res_conv2d( layer, shortcut, 256, [3, 3] )
+    pre_scale3 = layer
 
     layer = conv2d( layer, 512, [3, 3], ( 2, 2 ) )
     shortcut = layer
 
     for _ in range( 8 ):
         layer = conv2d( layer, 256, [1, 1] )
-        layer = Res_conv2d( layer, 512, [3, 3] )
-        layer = Res( layer, shortcut )
+        layer = Res_conv2d( layer, shortcut, 512, [3, 3] )
+    pre_scale2 = layer
 
     layer = conv2d( layer, 1024, [3, 3], ( 2, 2 ) )
     shortcut = layer
 
     for _ in range( 4 ):
         layer = conv2d( layer, 512, [1, 1] )
-        layer = Res_conv2d( layer, 1024, [3, 3] )
-        layer = Res( layer, shortcut )
+        layer = Res_conv2d( layer, shortcut, 1024, [3, 3] )
+    pre_scale1 = layer
 
-    return layer
+    return pre_scale1, pre_scale2, pre_scale3
+
+def get_layer2x( layer_final, pre_scale ):
+    layer2x = tf.image.resize_images(layer_final,
+                                     [2 * tf.shape(layer_final)[1], 2 * tf.shape(layer_final)[2]])
+    layer2x_add = tf.concat( 3 ,[layer2x, pre_scale] )
+
+    return layer2x_add
+
+def scale( layer, pre_scale2, pre_scale3 ):
+    layer_copy = layer
+    layer = conv2d( layer, 512, [1, 1] )
+    layer = conv2d( layer, 1024, [3, 3] )
+    layer = conv2d(layer, 512, [1, 1])
+    layer_final = layer
+    layer = conv2d(layer, 1024, [3, 3])
+
+    '''--------scale_1--------'''
+    scale_1 = conv2d( layer, 255, [1, 1] )
+
+    '''--------scale_2--------'''
+    layer = get_layer2x( layer_final, pre_scale2 )
+
+    layer = conv2d( layer, 256, [1, 1] )
+    layer= conv2d( layer, 512, [3, 3] )
+    layer = conv2d(layer, 256, [1, 1])
+    layer = conv2d(layer, 512, [3, 3])
+    layer = conv2d(layer, 256, [1, 1])
+    layer_final = layer
+    layer = conv2d(layer, 512, [3, 3])
+    scale_2 = conv2d( layer, 255, [1, 1] )
+
+    '''--------scale_3--------'''
+    layer = get_layer2x( layer_final, pre_scale3 )
+
+    for _ in range( 3 ):
+        layer = conv2d( layer, 128, [1, 1] )
+        layer = conv2d( layer, 256, [3, 3] )
+    scale_3 = conv2d( layer, 255, [1, 1] )
+
+    return scale_1, scale_2, scale_3
 
 
 
 
 
 
-'''--------Test the extrctor--------'''
+
+'''--------Test the scale--------'''
 if __name__ == "__main__":
     data = cv2.imread(  '../data/VOCtest_06-Nov-2007/JPEGImages/000001.jpg' )
     data = cv2.cvtColor( data, cv2.COLOR_BGR2RGB )
-    data = cv2.resize( data, ( 512, 512 ) )
+    data = cv2.resize( data, ( 416, 416 ) )
 
     data = tf.cast( tf.expand_dims( tf.constant( data ), 0 ), tf.float32 )
 
-    layer = feature_extractor( data )
+    pre_scale1, pre_scale2, pre_scale3 = feature_extractor( data )
+
+    scale_1, scale_2, scale_3 = scale( pre_scale1, pre_scale2, pre_scale3 )
 
     with tf.Session() as sess:
 
         sess.run( tf.initialize_all_variables() )
 
-        print( sess.run( layer ).shape )
+        print( sess.run( scale_2 ).shape )
