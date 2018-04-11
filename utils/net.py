@@ -3,8 +3,9 @@ import tensorflow as tf
 import skimage.transform
 
 
-# def create_placeholder( width, height ):
-#     X =
+def create_placeholder( width, height ):
+    X = tf.placeholder( tf.float32, [None, widht, height, 3] )
+    Y = tf.placeholder( tf.float32, [None, 255] )
 
 def Leaky_Relu( input, alpha = 0.01 ):
     output = tf.maximum( input, tf.multiply( input, alpha ) )
@@ -90,11 +91,11 @@ def feature_extractor( inputs ):
 def get_layer2x( layer_final, pre_scale ):
     layer2x = tf.image.resize_images(layer_final,
                                      [2 * tf.shape(layer_final)[1], 2 * tf.shape(layer_final)[2]])
-    layer2x_add = tf.concat( 3 ,[layer2x, pre_scale] )
+    layer2x_add = tf.concat( [layer2x, pre_scale], 3 )
 
     return layer2x_add
 
-def scale( layer, pre_scale2, pre_scale3 ):
+def scales( layer, pre_scale2, pre_scale3 ):
     layer_copy = layer
     layer = conv2d( layer, 512, [1, 1] )
     layer = conv2d( layer, 1024, [3, 3] )
@@ -106,7 +107,8 @@ def scale( layer, pre_scale2, pre_scale3 ):
     scale_1 = conv2d( layer, 255, [1, 1] )
 
     '''--------scale_2--------'''
-    layer = get_layer2x( layer_final, pre_scale2 )
+    layer = conv2d( layer_final, 256, [1, 1] )
+    layer = get_layer2x( layer, pre_scale2 )
 
     layer = conv2d( layer, 256, [1, 1] )
     layer= conv2d( layer, 512, [3, 3] )
@@ -118,7 +120,8 @@ def scale( layer, pre_scale2, pre_scale3 ):
     scale_2 = conv2d( layer, 255, [1, 1] )
 
     '''--------scale_3--------'''
-    layer = get_layer2x( layer_final, pre_scale3 )
+    layer = conv2d( layer_final, 128, [1, 1] )
+    layer = get_layer2x( layer, pre_scale3 )
 
     for _ in range( 3 ):
         layer = conv2d( layer, 128, [1, 1] )
@@ -143,10 +146,10 @@ if __name__ == "__main__":
 
     pre_scale1, pre_scale2, pre_scale3 = feature_extractor( data )
 
-    scale_1, scale_2, scale_3 = scale( pre_scale1, pre_scale2, pre_scale3 )
+    scale_1, scale_2, scale_3 = scales( pre_scale1, pre_scale2, pre_scale3 )
 
     with tf.Session() as sess:
 
         sess.run( tf.initialize_all_variables() )
 
-        print( sess.run( scale_2 ).shape )
+        print( sess.run( scale_3 ).shape )
