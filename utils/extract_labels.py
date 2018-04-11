@@ -37,7 +37,7 @@ def xml_extractor( dir ):
 
     return file_name, width, height, objects
 
-def labels_normaliszer( batches_filenames, target_width, target_height ):
+def labels_normaliszer( batches_filenames, target_width, target_height, layerout_width, layerout_height ):
 
     class_map = {
         'person' : 4,
@@ -74,7 +74,7 @@ def labels_normaliszer( batches_filenames, target_width, target_height ):
             width_proprotion = 1.0 * target_width / width
             height_proprotion = 1.0 * target_height / height
 
-            label = np.zeros( [target_height, target_width, 255] )
+            label = np.zeros( [layerout_height, layerout_width, 255] )
             for object in objects:
                 class_label = class_map[object[0]]
                 xmin = object[1]
@@ -88,18 +88,25 @@ def labels_normaliszer( batches_filenames, target_width, target_height ):
                 bdbox_width = ( 1.0 * xmax - xmin ) * width_proprotion
                 bdbox_height = ( 1.0 * ymax - ymin ) * height_proprotion
 
-                label[int( y )][int( x )][0] = x    # Point x
-                label[int( y )][int( x )][1] = y    # Point y
-                label[int( y )][int( x )][2] = bdbox_width    # bdbox width
-                label[int( y )][int( x )][3] = bdbox_height    # bdbox_height
-                label[int( y )][int( x )][4] = 0.5    # objectness
-                label[int( y )][int( x )][class_label] = 0.9    # class label
+                falg_width = width / layerout_width
+                flag_height = height / layerout_height
 
-                labels.append( label )
-            batch_labels.append( labels )
-        batches_labels.append( batch_labels )
+                box_x = x // falg_width
+                box_y = y // flag_height
 
-        batches_labels = np.array( batches_labels )
+                for i in range( 3 ):
+                    label[box_y][box_x][i * 25] = x    # point x
+                    label[box_y][box_x][i * 25 + 1] = y    # point y
+                    label[box_y][box_x][i * 25 + 2] = bdbox_width    # bdbox width
+                    label[box_y][box_x][i * 25 + 3] = bdbox_height    # bdbox height
+                    label[box_y][box_x][i * 25 + 4] = 1    # objectness
+                    label[box_y][box_x][i * 25 + class_label] = 0.9    # class label
+
+            labels.append( label )
+        batch_labels.append( labels )
+    batches_labels.append( batch_labels )
+
+    batches_labels = np.array( batches_labels )
 
     return batches_labels
 
