@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 
 def calculate_min( point, data ):
     min_point = point - data
@@ -36,22 +37,22 @@ def IOU_calculator( x, y, width, height, l_x, l_y, l_width, l_height ):
     l_y_min = calculate_min( l_y, height / 2 )
 
     '''--------Caculate Both Area's point--------'''
-    xend = min( x_max, l_x_max )
-    xstart = max( x_min, l_x_min )
+    xend = tf.minimum( x_max, l_x_max )
+    xstart = tf.maximum( x_min, l_x_min )
 
-    yend = min( y_max, l_y_max )
-    ystart = max( y_min, l_y_min )
+    yend = tf.minimum( y_max, l_y_max )
+    ystart = tf.maximum( y_min, l_y_min )
 
     area_width = xend - xstart
     area_height = yend - ystart
 
     '''--------Caculate the IOU--------'''
-    if area_width < 0 or area_height < 0:
-        IOU = 0
-    else:
-        area = area_width * area_height
+    area = area_width * area_height
 
-        IOU = area / ( width * height + l_width * l_height - area )
+    IOU = area / ( width * height + l_width * l_height - area )
+
+    IOU = tf.cond( area_width < 0, lambda : 0, lambda : IOU )
+    IOU = tf.cond( area_height < 0, lambda : 0, lambda : IOU )
 
     return IOU
 

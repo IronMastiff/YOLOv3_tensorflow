@@ -20,7 +20,7 @@ def objectness_loss( input, switch, alpha = 0.001 ):
 
 def location_loss( x, y, width, height, l_x, l_y, l_width, l_height, alpha = 0.001 ):
     point_loss = ( tf.square( l_x - x ) + tf.square( l_y - y ) ) * alpha
-    size_loss = ( tf.square( tf.sqrt( l_width ) - tf.sqrt( width ) ) + tf.square( tf.sqrt( l_height ) - tf.sqrt( height ) ) ) * alpha
+    size_loss = ( tf.square( np.sqrt( l_width ) - tf.sqrt( width ) ) + tf.square( tf.sqrt( l_height ) - tf.sqrt( height ) ) ) * alpha
 
     location_loss = point_loss + size_loss
 
@@ -32,11 +32,12 @@ def class_loss( input, label ):
     return classloss
 
 def calculate_loss( batch_inputs, batch_labels ):
+    print( batch_inputs.shape, len( batch_labels ), len( batch_labels[0] ), len( batch_labels[0][0] ) )
     batch_loss = 0
     # for batch in range( batch_inputs.shape[0] ):
-    for image_num in range( batch_inputs.shape[1] ):
-        for y in range( batch_inputs.shape[2] ):
-            for x in range( batch_inputs.shape[3] ):
+    for image_num in range( batch_inputs.shape[0] ):
+        for y in range( batch_inputs.shape[1] ):
+            for x in range( batch_inputs.shape[2] ):
                 for i in range( 3 ):
                     pretect_x = batch_inputs[image_num][y][x][i * 25]
                     pretect_y = batch_inputs[image_num][y][x][i * 25 + 1]

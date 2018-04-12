@@ -3,9 +3,11 @@ import tensorflow as tf
 import skimage.transform
 
 
-def create_placeholder( width, height ):
-    X = tf.placeholder( tf.float32, [None, widht, height, 3] )
-    Y = tf.placeholder( tf.float32, [None, final_widht, final_height, 255] )
+def create_placeholder( width, height, final_width, final_height ):
+    X = tf.placeholder( tf.float32, [None, width, height, 3] )
+    Y = tf.placeholder( tf.float32, [None,final_width, final_height, 255] )
+
+    return X, Y
 
 def Leaky_Relu( input, alpha = 0.01 ):
     output = tf.maximum( input, tf.multiply( input, alpha ) )
@@ -112,11 +114,11 @@ def scales( layer, pre_scale2, pre_scale3 ):
 
     layer = conv2d( layer, 256, [1, 1] )
     layer= conv2d( layer, 512, [3, 3] )
-    layer = conv2d(layer, 256, [1, 1])
-    layer = conv2d(layer, 512, [3, 3])
-    layer = conv2d(layer, 256, [1, 1])
+    layer = conv2d( layer, 256, [1, 1] )
+    layer = conv2d( layer, 512, [3, 3] )
+    layer = conv2d( layer, 256, [1, 1] )
     layer_final = layer
-    layer = conv2d(layer, 512, [3, 3])
+    layer = conv2d( layer, 512, [3, 3] )
     scale_2 = conv2d( layer, 255, [1, 1] )
 
     '''--------scale_3--------'''
@@ -152,4 +154,4 @@ if __name__ == "__main__":
 
         sess.run( tf.initialize_all_variables() )
 
-        print( sess.run( scale_3 ).shape )
+        print( sess.run( scale_1 ).shape )

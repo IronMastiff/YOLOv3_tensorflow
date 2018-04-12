@@ -7,7 +7,7 @@ from utils import extract_labels as extract_labels
 
 
 '''--------Here fnish the minibatch operation--------'''
-def image( batch_size, path ):
+def images( batch_size, path ):
     filenames = [join( path, f ) for f in listdir( path ) if isfile( join( path, f ) )]
 
     batch_filenames = []
@@ -32,8 +32,8 @@ def get_image( path, width, height ):
     return image
 
 def labels( batch_size, path ):
-    batch_labels = []
-    labels_filenames = image( batch_size, path )
+    # batch_labels = []
+    labels_filenames = images( batch_size, path )
     # for label_filename in labels_filenames:
     #     batch_label = extract_labels.labels_normaliszer( label_filename )
     #     batch_labels.append( batch_label )
@@ -43,8 +43,8 @@ def labels( batch_size, path ):
 
 
 
-'''--------Test image--------'''
+'''--------Test images--------'''
 if __name__ == '__main__':
-    image = image( 3, './data/VOCtrainval_06-Nov-2007/JPEGImages' )
+    image = images( 3, './data/VOCtrainval_06-Nov-2007/JPEGImages' )
 
     print( len( image ) )

@@ -1,7 +1,9 @@
-## Batch size
-batch_size: 5
+## Basic config
+batch_size: 1
+learning_rate: 0.001
+epoch: 1000
 
-## Target image size
+## crop image size
 height: 512
 width: 512
 
@@ -9,5 +11,5 @@ width: 512
 scale: 1
 
 ## Path
-datas_path: './data/VOCtrain_06-Nov-2007/JPGEImage'
-labels_path: './data/VOCtrain_06-Nov-2007/Annotations'
+datas_path: './data/VOCtrainval_06-Nov-2007/JPEGImages'
+labels_path: './data/VOCtrainval_06-Nov-2007/Annotations'

@@ -56,57 +56,52 @@ def labels_normaliszer( batches_filenames, target_width, target_height, layerout
         'train' : 18,
         'bottle' : 19,
         'chair' : 20,
-        'dining table' : 21,
-        'potted plant': 22,
+        'diningtable' : 21,
+        'pottedplant': 22,
         'sofa' : 23,
-        'tv/monitor' : 24
+        'tvmonitor' : 24
     }
 
-    batches_labels = []
-    batches_height_width = []
-    batch_labels = []
-    batch_height_width = []
-    labels = []
     height_width = []
+    batches_labels = []
     for batch_filenames in batches_filenames:
         for filename in batch_filenames:
+            batch_labels = []
             _, width, height, objects = xml_extractor( filename )
-            width_proprotion = 1.0 * target_width / width
-            height_proprotion = 1.0 * target_height / height
-
-            label = np.zeros( [layerout_height, layerout_width, 255] )
+            width_preprotion = target_width / int( width )
+            height_preprotion = target_height / int( height )
+            label = np.zeros( [int( layerout_height ), int( layerout_width ), 255] )
             for object in objects:
                 class_label = class_map[object[0]]
-                xmin = object[1]
-                ymin = object[2]
-                xmax = object[3]
-                ymax = object[4]
-
-                x = ( 1.0 * xmax + xmin ) / 2 * width_proprotion
-                y = ( 1.0 * ymax + ymin ) / 2 * height_proprotion
-
-                bdbox_width = ( 1.0 * xmax - xmin ) * width_proprotion
-                bdbox_height = ( 1.0 * ymax - ymin ) * height_proprotion
-
-                falg_width = width / layerout_width
-                flag_height = height / layerout_height
-
+                xmin = float( object[1] )
+                ymin = float( object[2] )
+                xmax = float( object[3] )
+                ymax = float( object[4] )
+                x = ( 1.0 * xmax + xmin ) / 2 * width_preprotion
+                y = ( 1.0 * ymax + ymin ) / 2 * height_preprotion
+                bdbox_width = ( 1.0 * xmax - xmin ) * width_preprotion
+                bdbox_height = ( 1.0 * ymax - ymin ) * height_preprotion
+                falg_width = int( target_width ) / layerout_width
+                flag_height = int( target_height ) / layerout_height
                 box_x = x // falg_width
                 box_y = y // flag_height
-
+                if box_x == layerout_width:
+                    box_x -= 1
+                if box_y == layerout_height:
+                    box_y -= 1
                 for i in range( 3 ):
-                    label[box_y][box_x][i * 25] = x    # point x
-                    label[box_y][box_x][i * 25 + 1] = y    # point y
-                    label[box_y][box_x][i * 25 + 2] = bdbox_width    # bdbox width
-                    label[box_y][box_x][i * 25 + 3] = bdbox_height    # bdbox height
-                    label[box_y][box_x][i * 25 + 4] = 1    # objectness
-                    label[box_y][box_x][i * 25 + class_label] = 0.9    # class label
+                    label[int( box_y ), int( box_x ), i * 25] = x    # point x
+                    label[int( box_y ), int( box_x ), i * 25 + 1] = y    # point y
+                    label[int( box_y ), int( box_x ), i * 25 + 2] = bdbox_width    # bdbox width
+                    label[int( box_y ), int( box_x ), i * 25 + 3] = bdbox_height    # bdbox height
+                    label[int( box_y ), int( box_x ), i * 25 + 4] = 1    # objectness
+                    label[int( box_y ), int( box_x ), i * 25 + int( class_label )] = 0.9    # class label
 
-            labels.append( label )
-        batch_labels.append( labels )
-    batches_labels.append( batch_labels )
+            batch_labels.append( label )
 
-    batches_labels = np.array( batches_labels )
+        batches_labels.append( batch_labels )
+
+    # batches_labels = np.array( batches_labels )
 
     return batches_labels
 
@@ -117,5 +112,7 @@ def labels_normaliszer( batches_filenames, target_width, target_height, layerout
 
 '''--------Test extract_labels--------'''
 if __name__ == '__main__':
-    file_name, width, height, objects = xml_extractor( '../data/VOCtest_06-Nov-2007/Annotations/000001.xml' )
-    print( file_name, '\n', width, '\n', height, '\n', objects )
+    dir = [['../data/VOCtest_06-Nov-2007/Annotations/000001.xml'], ['../data/VOCtest_06-Nov-2007/Annotations/000002.xml']]
+    batches_labels = labels_normaliszer( dir, 512, 512, 16, 16 )
+    print( np.array( dir ).shape )
+    print( np.array( batches_labels ).shape )

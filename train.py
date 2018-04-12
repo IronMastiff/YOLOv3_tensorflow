@@ -33,7 +33,6 @@ def main( FLAGS ):
                                                           FLAGS.height,
                                                           scale_width,
                                                           scale_height )
-    # print( len( normalize_labels ), len( normalize_labels[0], len( normalize_labels[0][0] ), len( normalize_labels[0][0][0], len( normalize_labels[0][0][0][0]))) )
 
     '''---------partition the train data and val data--------'''
     train_filenames = datas_filenames[: int( len( datas_filenames ) * 0.9 )]
@@ -69,13 +68,13 @@ def main( FLAGS ):
 
                 '''--------calculate loss--------'''
                 if FLAGS.scale == 1:
-                    loss = get_loss.calculate_loss( scale1, [train_labels[i]] )
+                    loss = get_loss.calculate_loss( scale1, train_labels[i] )
 
                 if FLAGS.scale == 2:
-                    loss = get_loss.calculate_loss( scale2, [train_labels[i]] )
+                    loss = get_loss.calculate_loss( scale2, train_labels[i] )
 
                 if FLAGS.scale == 3:
-                    loss = get_loss.calculate_loss( scale3, [train_labels[i]] )
+                    loss = get_loss.calculate_loss( scale3, train_labels[i] )
 
                 '''--------Optimizer--------'''
                 optimizer = tf.train.AdamOptimizer( learning_rate=FLAGS.learning_rate ).minimize( loss )
