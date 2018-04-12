@@ -31,45 +31,41 @@ def class_loss( input, label ):
 
     return classloss
 
-def calculate_loss( batches_inputs, batches_labels ):
+def calculate_loss( batch_inputs, batch_labels ):
     batch_loss = 0
-    for batch in range( batches_inputs.shape[0] ):
-        for image_num in range( batches_inputs.shape[1] ):
-            for y in range( batches_inputs.shape[2] ):
-                for x in range( batches_inputs.shape[3] ):
-                    for i in range( 3 ):
-                        pretect_x = batches_inputs[batch][image_num][y][x][i * 25]
-                        pretect_y = batches_inputs[batch][image_num][y][x][i * 25 + 1]
-                        pretect_width = batches_inputs[batch][image_num][y][x][i * 25 + 2]
-                        pretect_height = batches_inputs[batch][image_num][y][x][i * 25 + 3]
-                        pretect_objectness = batches_inputs[batch][image_num][y][x][i * 25 + 4]
-                        pretect_class = batches_inputs[batch][image_num][y][x][i * 25 + 5 : i * 25 + 5 + 20]
-                        label_x = batches_labels[batch][image_num][y][x][i * 25]
-                        label_y = batches_labels[batch][image_num][y][x][i * 25 + 1]
-                        label_width = batches_labels[batch][image_num][y][x][i * 25 + 2]
-                        label_height = batches_labels[batch][image_num][y][x][i * 25 + 3]
-                        label_objectness = batches_labels[batch][image_num][y][x][i * 25 + 4]
-                        label_class = batches_labels[batch][image_num][y][x][i * 25 + 5 : i * 25 + 5 + 20]
-
-                        IOU = get_IOU.IOU_calculator( pretect_x,
-                                                      pretect_y,
-                                                      pretect_width,
-                                                      pretect_height,
-                                                      label_x,
-                                                      label_y,
-                                                      label_width,
-                                                      label_height )
-
-                        loss = class_loss( pretect_class,
-                                           label_class ) + location_loss( pretect_x,
-                                                                          pretect_y,
-                                                                          pretect_width,
-                                                                          pretect_height,
-                                                                          label_x,
-                                                                          label_y,
-                                                                          label_width,
-                                                                          label_height ) + objectness_loss( IOU, label_objectness )
-
-                        batch_loss += loss
-
+    # for batch in range( batch_inputs.shape[0] ):
+    for image_num in range( batch_inputs.shape[1] ):
+        for y in range( batch_inputs.shape[2] ):
+            for x in range( batch_inputs.shape[3] ):
+                for i in range( 3 ):
+                    pretect_x = batch_inputs[image_num][y][x][i * 25]
+                    pretect_y = batch_inputs[image_num][y][x][i * 25 + 1]
+                    pretect_width = batch_inputs[image_num][y][x][i * 25 + 2]
+                    pretect_height = batch_inputs[image_num][y][x][i * 25 + 3]
+                    pretect_objectness = batch_inputs[image_num][y][x][i * 25 + 4]
+                    pretect_class = batch_inputs[image_num][y][x][i * 25 + 5 : i * 25 + 5 + 20]
+                    label_x = batch_labels[image_num][y][x][i * 25]
+                    label_y = batch_labels[image_num][y][x][i * 25 + 1]
+                    label_width = batch_labels[image_num][y][x][i * 25 + 2]
+                    label_height = batch_labels[image_num][y][x][i * 25 + 3]
+                    label_objectness = batch_labels[image_num][y][x][i * 25 + 4]
+                    label_class = batch_labels[image_num][y][x][i * 25 + 5 : i * 25 + 5 + 20]
+                    IOU = get_IOU.IOU_calculator( pretect_x,
+                                                  pretect_y,
+                                                  pretect_width,
+                                                  pretect_height,
+                                                  label_x,
+                                                  label_y,
+                                                  label_width,
+                                                  label_height )
+                    loss = class_loss( pretect_class,
+                                       label_class ) + location_loss( pretect_x,
+                                                                      pretect_y,
+                                                                      pretect_width,
+                                                                      pretect_height,
+                                                                      label_x,
+                                                                      label_y,
+                                                                      label_width,
+                                                                      label_height ) + objectness_loss( IOU, label_objectness )
+                    batch_loss += loss
     return batch_loss
