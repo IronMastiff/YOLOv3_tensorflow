@@ -40,26 +40,26 @@ def xml_extractor( dir ):
 def labels_normaliszer( batches_filenames, target_width, target_height, layerout_width, layerout_height ):
 
     class_map = {
-        'person' : 4,
-        'bird' : 5,
-        'cat' : 6,
-        'cow' : 7,
-        'dog' : 8,
-        'horse' : 9,
-        'sheep' : 10,
-        'aeroplane' : 11,
-        'bicycle' : 12,
-        'boat' : 13,
-        'bus' : 14,
-        'car' : 15,
-        'motorbike' : 16,
-        'train' : 17,
-        'bottle' : 18,
-        'chair' : 19,
-        'dining table' : 20,
-        'potted plant': 21,
-        'sofa' : 22,
-        'tv/monitor' : 23
+        'person' : 5,
+        'bird' : 6,
+        'cat' : 7,
+        'cow' : 8,
+        'dog' : 9,
+        'horse' : 10,
+        'sheep' : 11,
+        'aeroplane' : 12,
+        'bicycle' : 13,
+        'boat' : 14,
+        'bus' : 15,
+        'car' : 16,
+        'motorbike' : 17,
+        'train' : 18,
+        'bottle' : 19,
+        'chair' : 20,
+        'dining table' : 21,
+        'potted plant': 22,
+        'sofa' : 23,
+        'tv/monitor' : 24
     }
 
     batches_labels = []
