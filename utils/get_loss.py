@@ -53,14 +53,14 @@ def calculate_loss( batch_inputs, batch_labels ):
                     label_height = batch_labels[image_num][y][x][i * 25 + 3]
                     label_objectness = batch_labels[image_num][y][x][i * 25 + 4]
                     label_class = batch_labels[image_num][y][x][i * 25 + 5 : i * 25 + 5 + 20]
-                    IOU = get_IOU.IOU_calculator( pretect_x,
-                                                  pretect_y,
-                                                  pretect_width,
-                                                  pretect_height,
-                                                  label_x,
-                                                  label_y,
-                                                  label_width,
-                                                  label_height )
+                    IOU = get_IOU.IOU_calculator( tf.cast( pretect_x, tf.float32 ),
+                                                  tf.cast( pretect_y, tf.float32 ),
+                                                  tf.cast( pretect_width, tf.float32 ),
+                                                  tf.cast( pretect_height, tf.float32 ),
+                                                  tf.cast( label_x, tf.float32 ),
+                                                  tf.cast( label_y, tf.float32 ),
+                                                  tf.cast( label_width, tf.float32 ),
+                                                  tf.cast( label_height, tf.float32 ) )
                     loss = class_loss( pretect_class,
                                        label_class ) + location_loss( pretect_x,
                                                                       pretect_y,
@@ -75,8 +75,8 @@ def calculate_loss( batch_inputs, batch_labels ):
 
 '''--------test calculate loss--------'''
 if __name__ == '__main__':
-    batch_datas = np.ones( [1, 1, 1, 255] )
-    batch_labels = [[[np.ones( 255 )]]]
+    batch_datas = np.ones( [1, 1, 1, 255], dtype = np.float32 )
+    batch_labels = [[[np.ones( 255, dtype = np.float32 )]]]
     batch_loss = calculate_loss( batch_datas, batch_labels )
 
     print( len( batch_datas ), len( batch_datas[0] ), len( batch_datas[0][0] ), len( batch_datas[0][0][0] ) )
