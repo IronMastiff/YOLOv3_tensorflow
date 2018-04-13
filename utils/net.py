@@ -3,9 +3,9 @@ import tensorflow as tf
 import skimage.transform
 
 
-def create_placeholder( width, height, final_width, final_height ):
-    X = tf.placeholder( tf.float32, [None, width, height, 3] )
-    Y = tf.placeholder( tf.float32, [None,final_width, final_height, 255] )
+def create_placeholder( batch_size, width, height, final_width, final_height ):
+    X = tf.placeholder( tf.float32, [batch_size, width, height, 3] )
+    Y = tf.placeholder( tf.float32, [batch_size, final_width, final_height, 255] )
 
     return X, Y
 
