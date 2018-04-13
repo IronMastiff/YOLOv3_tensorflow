@@ -11,28 +11,30 @@ def objectness_loss( input, switch, alpha = 0.001 ):
     :return: objectness_loss
     '''
 
-    IOU_loss = tf.square( switch * 0.5 - input )
+    IOU_loss = tf.square( switch - input )
+    loss_max = tf.square( switch * 0.5 - input )
 
-    if not switch:
-        IOU_loss = IOU_loss * alpha
+    IOU_loss = tf.cond( IOU_loss < loss_max, lambda : tf.cast( 0, tf.float64 ), lambda : IOU_loss )
+
+    IOU_loss = tf.cond( switch < 1, lambda : IOU_loss * alpha, lambda : IOU_loss )
 
     return IOU_loss
 
 def location_loss( x, y, width, height, l_x, l_y, l_width, l_height, alpha = 0.001 ):
     point_loss = ( tf.square( l_x - x ) + tf.square( l_y - y ) ) * alpha
-    size_loss = ( tf.square( np.sqrt( l_width ) - tf.sqrt( width ) ) + tf.square( tf.sqrt( l_height ) - tf.sqrt( height ) ) ) * alpha
+    size_loss = ( tf.square( tf.sqrt( l_width ) - tf.sqrt( width ) ) + tf.square( tf.sqrt( l_height ) - tf.sqrt( height ) ) ) * alpha
 
     location_loss = point_loss + size_loss
 
     return location_loss
 
-def class_loss( input, label ):
-    classloss = tf.square( label - input )
+def class_loss( inputs, labels ):
+    classloss = tf.square( labels - inputs )
+    loss_sum = tf.reduce_sum( classloss )
 
-    return classloss
+    return loss_sum
 
 def calculate_loss( batch_inputs, batch_labels ):
-    print( batch_inputs.shape, len( batch_labels ), len( batch_labels[0] ), len( batch_labels[0][0] ) )
     batch_loss = 0
     # for batch in range( batch_inputs.shape[0] ):
     for image_num in range( batch_inputs.shape[0] ):
@@ -70,3 +72,15 @@ def calculate_loss( batch_inputs, batch_labels ):
                                                                       label_height ) + objectness_loss( IOU, label_objectness )
                     batch_loss += loss
     return batch_loss
+
+'''--------test calculate loss--------'''
+if __name__ == '__main__':
+    batch_datas = np.ones( [1, 1, 1, 255] )
+    batch_labels = [[[np.ones( 255 )]]]
+    batch_loss = calculate_loss( batch_datas, batch_labels )
+
+    print( len( batch_datas ), len( batch_datas[0] ), len( batch_datas[0][0] ), len( batch_datas[0][0][0] ) )
+
+    sess = tf.Session()
+
+    print( sess.run( batch_loss ) )
