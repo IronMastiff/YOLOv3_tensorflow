@@ -51,8 +51,8 @@ def IOU_calculator( x, y, width, height, l_x, l_y, l_width, l_height ):
 
     IOU = area / ( width * height + l_width * l_height - area )
 
-    IOU = tf.cond( area_width < 0, lambda : 0, lambda : IOU )
-    IOU = tf.cond( area_height < 0, lambda : 0, lambda : IOU )
+    IOU = tf.cond( area_width < 0, lambda : tf.cast( 0.0, tf.float32 ), lambda : IOU )
+    IOU = tf.cond( area_height < 0, lambda : tf.cast( 0.0, tf.float32 ), lambda : IOU )
 
     return IOU
 
@@ -60,5 +60,8 @@ def IOU_calculator( x, y, width, height, l_x, l_y, l_width, l_height ):
 
 '''--------Test the IOU function--------'''
 if __name__ == '__main__':
-    IOU = IOU_calculator( 1, 1, 2, 2, 2, 2, 2, 2 )
-    print( IOU )
+    IOU = IOU_calculator( tf.cast( 1, tf.float64 ), tf.cast( 1, tf.float64 ), tf.cast( 2, tf.float64 ), tf.cast( 2, tf.float64 ), tf.cast( 2, tf.float64 ), tf.cast( 2, tf.float64 ), tf.cast( 2, tf.float64 ), tf.cast( 2, tf.float64 ) )
+    IOU = IOU_calculator(tf.cast(1, tf.float64), tf.cast(1, tf.float64), tf.cast(1, tf.float64), tf.cast(1, tf.float64),
+                         tf.cast(1, tf.float64), tf.cast(1, tf.float64), tf.cast(1, tf.float64), tf.cast(1, tf.float64))
+    sess = tf.Session()
+    print( sess.run( IOU ) )
