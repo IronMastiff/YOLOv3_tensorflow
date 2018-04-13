@@ -3,7 +3,7 @@ batch_size: 1
 learning_rate: 0.001
 epoch: 1000
 
-## crop image size
+## reset image size
 height: 128
 width: 128
 
