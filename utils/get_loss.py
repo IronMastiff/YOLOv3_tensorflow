@@ -14,7 +14,7 @@ def objectness_loss( input, switch, alpha = 0.001 ):
     IOU_loss = tf.square( switch - input )
     loss_max = tf.square( switch * 0.5 - input )
 
-    IOU_loss = tf.cond( IOU_loss < loss_max, lambda : tf.cast( 0, tf.float64 ), lambda : IOU_loss )
+    IOU_loss = tf.cond( IOU_loss < loss_max, lambda : tf.cast( 0, tf.float32 ), lambda : IOU_loss )
 
     IOU_loss = tf.cond( switch < 1, lambda : IOU_loss * alpha, lambda : IOU_loss )
 
