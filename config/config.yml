@@ -4,8 +4,8 @@ learning_rate: 0.001
 epoch: 1000
 
 ## crop image size
-height: 512
-width: 512
+height: 128
+width: 128
 
 ## The scale size that the net work output.
 scale: 1
