@@ -17,13 +17,11 @@ def main( FLAGS ):
 
     scale_width, scale_height = select_things.select_scale( FLAGS.scale, FLAGS.width, FLAGS.height )
     '''--------Creat palceholder--------'''
-    datas, labels = net.create_placeholder( FLAGS.width, FLAGS.height, scale_width, scale_height )
+    datas, labels = net.create_placeholder( FLAGS.batch_size, FLAGS.width, FLAGS.height, scale_width, scale_height )
 
     '''--------net--------'''
     pre_scale1, pre_scale2, pre_scale3 = net.feature_extractor( datas )
     scale1, scale2, scale3 = net.scales( pre_scale1, pre_scale2, pre_scale3 )
-
-
 
     '''--------get labels_filenames and datas_filenames--------'''
     datas_filenames = reader.images( FLAGS.batch_size, FLAGS.datas_path )
@@ -39,6 +37,23 @@ def main( FLAGS ):
     train_labels = normalize_labels[: int( len( normalize_labels ) * 0.9 )]
     val_filenames = datas_filenames[len( datas_filenames ) - int( len( datas_filenames ) * 0.9 ) :]
     val_labels = normalize_labels[len( normalize_labels ) - int( len( normalize_labels ) * 0.9 ) :]
+
+    '''--------calculate loss--------'''
+    if FLAGS.scale == 1:
+        loss = get_loss.calculate_loss( scale1, labels )
+
+    if FLAGS.scale == 2:
+        loss = get_loss.calculate_loss( scale2, labels )
+
+    if FLAGS.scale == 3:
+        loss = get_loss.calculate_loss( scale3, labels )
+
+    '''--------Optimizer--------'''
+    optimizer = tf.train.AdamOptimizer( learning_rate=FLAGS.learning_rate ).minimize( loss )
+
+    tf.summary.scalar( 'epoch_loss', loss )
+
+    merged = tf.summary.merge_all()
 
     init = tf.initialize_all_variables()
 
@@ -64,35 +79,18 @@ def main( FLAGS ):
 
                 normalize_datas = np.array( normalize_datas )
 
-                scale1, scale2, scale3 = sess.run( [scale1, scale2, scale3], feed_dict = {datas: normalize_datas} )
-
-                '''--------calculate loss--------'''
-                if FLAGS.scale == 1:
-                    loss = get_loss.calculate_loss( scale1, train_labels[i] )
-
-                if FLAGS.scale == 2:
-                    loss = get_loss.calculate_loss( scale2, train_labels[i] )
-
-                if FLAGS.scale == 3:
-                    loss = get_loss.calculate_loss( scale3, train_labels[i] )
-
-                '''--------Optimizer--------'''
-                optimizer = tf.train.AdamOptimizer( learning_rate=FLAGS.learning_rate ).minimize( loss )
-
-                batch_loss = sess.run( [optimizer, loss] )
+                _, batch_loss = sess.run( [optimizer, loss], feed_dict = {datas: normalize_datas, labels: train_labels[i]} )
 
                 epoch_loss =+ batch_loss
-
-                tf.summary.scalar( 'epoch_loss', loss )
 
             if epoch % 10 == 0:
                 print( 'Cost after epoch %i: %f' % ( epoch, epoch_loss ) )
 
             if epoch % 50 == 0:
                 val_loss = 0
-                for val_filename, val_label in val_filenames, val_labels:
+                for i in range( len( val_filenames ) ):
                     normalize_datas = []
-                    for data_filename in val_filename:
+                    for data_filename in val_filename[i]:
                         image = reader.get_image( data_filename, FLAGS.widht, FLAGS.height )
                         image = np.array( image, np.float32 )
 
@@ -100,15 +98,14 @@ def main( FLAGS ):
 
                     normalize_datas = np.array( normalize_datas )
 
-                    batch_loss = sess.run( [loss], feed_dict = {datas: normalize_datas, labels: val_label } )
+                    batch_loss = sess.run( [loss], feed_dict = {datas: normalize_datas, labels: val_labels[i]} )
 
                     val_loss =+ batch_loss
 
-                    tf.summary.scalar('val_loss', val_loss)
+                    tf.summary.scalar( 'val_loss', val_loss )
 
                 print( 'VAL_Cost after epoch %i: %f' %( epoch, val_loss ) )
                 saver.save( sess, save_path, global_step = epoch )
-        merged = tf.summary.merge_all()
 
 
 
