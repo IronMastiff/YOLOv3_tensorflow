@@ -65,8 +65,8 @@ def labels_normaliszer( batches_filenames, target_width, target_height, layerout
     height_width = []
     batches_labels = []
     for batch_filenames in batches_filenames:
+        batch_labels = []
         for filename in batch_filenames:
-            batch_labels = []
             _, width, height, objects = xml_extractor( filename )
             width_preprotion = target_width / int( width )
             height_preprotion = target_height / int( height )
@@ -112,7 +112,7 @@ def labels_normaliszer( batches_filenames, target_width, target_height, layerout
 
 '''--------Test extract_labels--------'''
 if __name__ == '__main__':
-    dir = [['../data/VOCtest_06-Nov-2007/Annotations/000001.xml'], ['../data/VOCtest_06-Nov-2007/Annotations/000002.xml']]
+    dir = [['../data/VOCtest_06-Nov-2007/Annotations/000001.xml', '../data/VOCtest_06-Nov-2007/Annotations/000002.xml'], ['../data/VOCtest_06-Nov-2007/Annotations/000003.xml', '../data/VOCtest_06-Nov-2007/Annotations/000004.xml']]
     batches_labels = labels_normaliszer( dir, 512, 512, 16, 16 )
     print( np.array( dir ).shape )
     print( np.array( batches_labels ).shape )
