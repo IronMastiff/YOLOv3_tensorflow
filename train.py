@@ -55,6 +55,8 @@ def main( FLAGS ):
 
     merged = tf.summary.merge_all()
 
+    writer = tf.summary.FileWriter( "logs/", sess.graph )
+
     init = tf.initialize_all_variables()
 
     with tf.Session() as sess:
@@ -80,7 +82,8 @@ def main( FLAGS ):
 
                 normalize_datas = np.array( normalize_datas )
 
-                _, batch_loss = sess.run( [optimizer, loss], feed_dict = {datas: normalize_datas, labels: train_labels[i]} )
+                _, batch_loss, rs = sess.run( [optimizer, loss, merged], feed_dict = {datas: normalize_datas, labels: train_labels[i]} )
+                writer.add_summary( rs, epoch )
 
                 epoch_loss =+ batch_loss
 
