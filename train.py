@@ -87,7 +87,7 @@ def main( FLAGS ):
             if epoch % 10 == 0:
                 print( 'Cost after epoch %i: %f' % ( epoch, epoch_loss ) )
 
-            if epoch % 1 == 0:
+            if epoch % 50 == 0:
                 val_loss = tf.cast( 0, tf.float32 )
                 for i in range( len( val_filenames ) ):
                     normalize_datas = []
