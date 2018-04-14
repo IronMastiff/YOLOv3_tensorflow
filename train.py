@@ -103,8 +103,6 @@ def main( FLAGS ):
 
                     val_loss =+ batch_loss
 
-                    tf.summary.scalar( 'val_loss', val_loss )
-
                 print( 'VAL_Cost after epoch %i: %f' %( epoch, val_loss ) )
                 saver.save( sess, save_path, global_step = epoch )
 
