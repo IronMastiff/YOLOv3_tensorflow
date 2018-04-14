@@ -30,18 +30,6 @@ def conv2d( inputs, filters, shape, stride = ( 1, 1 ) ):
     return layer
 
 
-def no_activation_conv2d( inputs, filters, shape, stride = ( 1, 1 ) ):
-    layer = tf.layers.conv2d( inputs,
-                              filters,
-                              shape,
-                              stride,
-                              padding = 'SAME',
-                              kernel_initializer = tf.truncated_normal_initializer( stddev = 0.01 ) )
-
-    layer = tf.layers.batch_normalization( layer, training = True )
-
-    return layer
-
 def Res_conv2d( inputs, shortcut, filters, shape, stride = ( 1, 1 ) ):
     conv = conv2d( inputs, filters, shape )
     Res = Leaky_Relu( conv + shortcut )
