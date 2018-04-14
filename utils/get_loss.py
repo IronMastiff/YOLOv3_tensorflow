@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 from utils import IOU as get_IOU
 
-def objectness_loss( input, switch, alpha = 0.0001 ):
+def objectness_loss( input, switch, alpha = 0.5 ):
     '''
     Calculate the objectness loss
 
@@ -20,7 +20,7 @@ def objectness_loss( input, switch, alpha = 0.0001 ):
 
     return IOU_loss
 
-def location_loss( x, y, width, height, l_x, l_y, l_width, l_height, alpha = 0.0001 ):
+def location_loss( x, y, width, height, l_x, l_y, l_width, l_height, alpha = 5 ):
     point_loss = ( tf.square( l_x - x ) + tf.square( l_y - y ) ) * alpha
     size_loss = ( tf.square( tf.sqrt( l_width ) - tf.sqrt( width ) ) + tf.square( tf.sqrt( l_height ) - tf.sqrt( height ) ) ) * alpha
 
@@ -36,9 +36,6 @@ def class_loss( inputs, labels ):
 
 def calculate_loss( batch_inputs, batch_labels ):
     batch_loss = 0
-    loss1 = []
-    loss2 = []
-    loss3 = []
     # for batch in range( batch_inputs.shape[0] ):
     for image_num in range( batch_inputs.shape[0] ):
         for y in range( batch_inputs.shape[1] ):
