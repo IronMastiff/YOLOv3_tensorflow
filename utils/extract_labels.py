@@ -70,7 +70,7 @@ def labels_normaliszer( batches_filenames, target_width, target_height, layerout
             _, width, height, objects = xml_extractor( filename )
             width_preprotion = target_width / int( width )
             height_preprotion = target_height / int( height )
-            label = np.zeros( [int( layerout_height ), int( layerout_width ), 255] )
+            label = np.add( np.zeros( [int( layerout_height ), int( layerout_width ), 255] ), 1e-8 )
             for object in objects:
                 class_label = class_map[object[0]]
                 xmin = float( object[1] )

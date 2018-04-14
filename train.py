@@ -68,7 +68,7 @@ def main( FLAGS ):
 
 
         for epoch in range( FLAGS.epoch ):
-            epoch_loss = 0
+            epoch_loss = tf.cast( 0, tf.float32 )
             for i in range( len( train_filenames ) ):
                 normalize_datas = []
                 for data_filename in train_filenames[i]:
@@ -87,18 +87,19 @@ def main( FLAGS ):
                 print( 'Cost after epoch %i: %f' % ( epoch, epoch_loss ) )
 
             if epoch % 50 == 0:
-                val_loss = 0
+                val_loss = tf.cast( 0, tf.float32 )
                 for i in range( len( val_filenames ) ):
                     normalize_datas = []
-                    for data_filename in val_filename[i]:
-                        image = reader.get_image( data_filename, FLAGS.widht, FLAGS.height )
+                    for val_filename in val_filenames[i]:
+                        image = reader.get_image( val_filename, FLAGS.width, FLAGS.height )
                         image = np.array( image, np.float32 )
+                        image = np.divide( image, 255 )
 
                         normalize_datas.append( image )
 
                     normalize_datas = np.array( normalize_datas )
 
-                    batch_loss = sess.run( [loss], feed_dict = {datas: normalize_datas, labels: val_labels[i]} )
+                    batch_loss = sess.run( loss, feed_dict = {datas: normalize_datas, labels: val_labels[i]} )
 
                     val_loss =+ batch_loss
 
