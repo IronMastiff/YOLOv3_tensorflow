@@ -37,7 +37,7 @@ def xml_extractor( dir ):
 
     return file_name, width, height, objects
 
-def labels_normaliszer( batches_filenames, target_width, target_height, layerout_width, layerout_height ):
+def labels_normalizer( batches_filenames, target_width, target_height, layerout_width, layerout_height ):
 
     class_map = {
         'person' : 5,
@@ -113,6 +113,6 @@ def labels_normaliszer( batches_filenames, target_width, target_height, layerout
 '''--------Test extract_labels--------'''
 if __name__ == '__main__':
     dir = [['../data/VOCtest_06-Nov-2007/Annotations/000001.xml', '../data/VOCtest_06-Nov-2007/Annotations/000002.xml'], ['../data/VOCtest_06-Nov-2007/Annotations/000003.xml', '../data/VOCtest_06-Nov-2007/Annotations/000004.xml']]
-    batches_labels = labels_normaliszer( dir, 512, 512, 16, 16 )
+    batches_labels = labels_normalizer( dir, 512, 512, 16, 16 )
     print( np.array( dir ).shape )
     print( np.array( batches_labels ).shape )
