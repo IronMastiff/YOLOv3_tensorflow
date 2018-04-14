@@ -26,7 +26,7 @@ def main( FLAGS ):
     '''--------get labels_filenames and datas_filenames--------'''
     datas_filenames = reader.images( FLAGS.batch_size, FLAGS.datas_path )
     labels_fienames = reader.labels( FLAGS.batch_size, FLAGS.labels_path )
-    normalize_labels = extract_labels.labels_normaliszer( labels_fienames,
+    normalize_labels = extract_labels.labels_normalizer( labels_fienames,
                                                           FLAGS.width,
                                                           FLAGS.height,
                                                           scale_width,
