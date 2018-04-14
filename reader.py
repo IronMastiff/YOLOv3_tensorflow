@@ -17,10 +17,11 @@ def images( batch_size, path ):
 
         batch_filenames.append( batch_filename )
 
-    if len( filenames ) % batch_size:
-        batch_filename = filenames[num * batch_size :]
+    '''--------Ignore some data--------'''
+    # if len( filenames ) % batch_size:
+    #     batch_filename = filenames[num * batch_size :]
 
-        batch_filenames.append( batch_filename )
+    #     batch_filenames.append( batch_filename )
 
     return batch_filenames
 
