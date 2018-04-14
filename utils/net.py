@@ -130,6 +130,10 @@ def scales( layer, pre_scale2, pre_scale3 ):
         layer = conv2d( layer, 256, [3, 3] )
     scale_3 = conv2d( layer, 255, [1, 1] )
 
+    scale_1 = tf.abs( scale_1 )
+    scale_2 = tf.abs( scale_2 )
+    scale_3 = tf.abs( scale_3 )
+
     return scale_1, scale_2, scale_3
 
 
