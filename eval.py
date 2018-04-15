@@ -25,7 +25,6 @@ def main( FLAGS ):
     scale1, scale2, scale3 = net.scales( pre_scale1, pre_scale2, pre_scale3 )
 
     with tf.Session() as sess:
-        start_time = time.time()
         saver = tf.train.Saver()
         save_path = select_things.select_checkpoint( FLAGS.scale )
         last_checkpoint = tf.train.latest_checkpoint( save_path, 'checkpoint' )
@@ -35,6 +34,7 @@ def main( FLAGS ):
         else:
             print( 'Model has not trained' )
 
+        start_time = time.time()
         scale1, scale2, scale3 = sess.run( [scale1, scale2, scale3] )
 
     if FLAGS.scale == 1:
@@ -61,7 +61,15 @@ def main( FLAGS ):
                                     (0, 255, 0),
                                     2 )
 
-    
+    generate_image = FLAGS.save_dir + '/res.jpg'
+    if not os.path.exists( FLAGS.save_dir ):
+        os.makedirs( FLAGS.save_dir )
+
+    with open( generate_image, 'wb' ) as img:
+        img.write( output_image )
+        end_time = time.time()
+
+    print( 'Use time: ', end_time - start_time )
 
     plt.imshow( output_image )
     plt.show()
