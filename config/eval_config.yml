@@ -1,0 +1,12 @@
+# Image dir
+image_dir: './data/VOCtest_06-Nov-2007/JPEGImages/000001.jpg'
+
+# Select the scale
+scale: 1
+
+# The path of the target image to save
+save_dir: './generated_images'
+
+# Out put image attribute
+width: 512
+height: 512
