@@ -2,21 +2,22 @@ import tensorflow as tf
 import numpy as np
 from utils import IOU as get_IOU
 
-def objectness_loss( input, switch, alpha = 0.5 ):
+def objectness_loss( input, switch, l_switch, alpha = 0.5 ):
     '''
     Calculate the objectness loss
 
     :param input: input IOU
-    :param switch: Target in this box is 1, else 0
+    :param switch: If target in this box is 1, else 1e-8
+    :param l_switch: Target in this box is 1, else 0
     :return: objectness_loss
     '''
 
-    IOU_loss = tf.square( switch - input )
-    loss_max = tf.square( switch * 0.5 - input )
+    IOU_loss = tf.square( l_switch - input * switch )
+    loss_max = tf.square( l_switch * 0.5 - input * switch )
 
     IOU_loss = tf.cond( IOU_loss < loss_max, lambda : tf.cast( 1e-8, tf.float32 ), lambda : IOU_loss )
 
-    IOU_loss = tf.cond( switch < 1, lambda : IOU_loss * alpha, lambda : IOU_loss )
+    IOU_loss = tf.cond( l_switch < 1, lambda : IOU_loss * alpha, lambda : IOU_loss )
 
     return IOU_loss
 
@@ -69,7 +70,7 @@ def calculate_loss( batch_inputs, batch_labels ):
                                                                       label_x,
                                                                       label_y,
                                                                       label_width,
-                                                                      label_height ) + objectness_loss( IOU, label_objectness )
+                                                                      label_height ) + objectness_loss( IOU, pretect_objectness, label_objectness )
 
                     batch_loss += loss
     return batch_loss
