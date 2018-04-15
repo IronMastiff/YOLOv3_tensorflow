@@ -19,6 +19,12 @@ def main( FLAGS ):
 
     input_image = reader.get_image( FLAGS.image_dir, FLAGS.image_width, FLAGS.image_height )
 
+    '''--------net--------'''
+    pre_scale1, pre_scale2, pre_scale3 = net.feature_extractor( input_iamge )
+    scale1, scale2, scale3 = net.scales( pre_scale1, pre_scale2, pre_scale3 )
+
+
+
 
 
 
