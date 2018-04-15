@@ -51,20 +51,21 @@ def main( FLAGS ):
     '''--------Optimizer--------'''
     optimizer = tf.train.AdamOptimizer( learning_rate=FLAGS.learning_rate ).minimize( loss )
 
-    tf.summary.scalar( 'epoch_loss', loss )
-
+    tf.summary.scalar( 'loss',  loss )
     merged = tf.summary.merge_all()
-
-    writer = tf.summary.FileWriter( "logs/", sess.graph )
 
     init = tf.initialize_all_variables()
 
     with tf.Session() as sess:
+        writer = tf.summary.FileWriter( "logs/", sess.graph )
+        number = 0
+
         saver = tf.train.Saver()
         save_path = select_things.select_checkpoint( FLAGS.scale )
         last_checkpoint = tf.train.latest_checkpoint( save_path, 'checkpoint' )
         if last_checkpoint:
             saver.restore( sess, last_checkpoint )
+            number = int( last_checkpoint[28 :] ) + 1
             print( 'Reuse model' )
         else:
             sess.run( init )
@@ -83,14 +84,15 @@ def main( FLAGS ):
                 normalize_datas = np.array( normalize_datas )
 
                 _, batch_loss, rs = sess.run( [optimizer, loss, merged], feed_dict = {datas: normalize_datas, labels: train_labels[i]} )
-                writer.add_summary( rs, epoch )
 
                 epoch_loss =+ batch_loss
 
-            if epoch % 10 == 0:
+            writer.add_summary( rs, epoch )
+
+            if epoch % 1 == 0:
                 print( 'Cost after epoch %i: %f' % ( epoch, epoch_loss ) )
 
-            if epoch % 50 == 0:
+            if epoch % 5 == 0:
                 val_loss = tf.cast( 0, tf.float32 )
                 for i in range( len( val_filenames ) ):
                     normalize_datas = []
@@ -108,7 +110,7 @@ def main( FLAGS ):
                     val_loss =+ batch_loss
 
                 print( 'VAL_Cost after epoch %i: %f' %( epoch, val_loss ) )
-                saver.save( sess, save_path, global_step = epoch )
+                saver.save( sess, os.path.join( save_path, 'scale1.ckpt' ), global_step = epoch + number )
 
 
 
