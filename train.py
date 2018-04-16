@@ -66,7 +66,7 @@ def main( FLAGS ):
         if last_checkpoint:
             saver.restore( sess, last_checkpoint )
             number = int( last_checkpoint[28 :] ) + 1
-            print( 'Reuse model' )
+            print( 'Reuse model form: ', format( last_checkpoint ) )
         else:
             sess.run( init )
 
@@ -87,12 +87,12 @@ def main( FLAGS ):
 
                 epoch_loss =+ batch_loss
 
-            writer.add_summary( rs, epoch )
+            writer.add_summary( rs, epoch + number )
 
             if epoch % 1 == 0:
-                print( 'Cost after epoch %i: %f' % ( epoch, epoch_loss ) )
+                print( 'Cost after epoch %i: %f' % ( epoch + number, epoch_loss ) )
 
-            if epoch % 5 == 0:
+            if epoch % 1 == 0:
                 val_loss = tf.cast( 0, tf.float32 )
                 for i in range( len( val_filenames ) ):
                     normalize_datas = []
@@ -109,8 +109,9 @@ def main( FLAGS ):
 
                     val_loss =+ batch_loss
 
-                print( 'VAL_Cost after epoch %i: %f' %( epoch, val_loss ) )
-                saver.save( sess, os.path.join( save_path, 'scale1.ckpt' ), global_step = epoch + number )
+                print( 'VAL_Cost after epoch %i: %f' %( epoch + number, val_loss ) )
+                name = 'scale' + str( FLAGS.scale ) + '.ckpt'
+                saver.save( sess, os.path.join( save_path, name ), global_step = epoch + number )
 
 
 
