@@ -9,6 +9,11 @@ def create_placeholder( batch_size, width, height, final_width, final_height ):
 
     return X, Y
 
+def create_eval_placeholder( width, height ):
+    image = tf.placeholder( tf.float32, [1, width, height, 3] )
+
+    return image
+
 def Leaky_Relu( input, alpha = 0.01 ):
     output = tf.maximum( input, tf.multiply( input, alpha ) )
 

@@ -1,23 +1,24 @@
 import numpy as np
 
 def label_extractor( scale ):
-    boxes_label = []
-    for box in scale:
-        box_labels = []
-        for i in range( 3 ):
-            pretect_x = box[i * 25]
-            pretect_y = box[i * 25 + 1]
-            pretect_width = box[i * 25 + 2]
-            pretect_height = box[i * 25 + 3]
-            pretect_objectness = box[i * 25 + 4]
-            pretect_class = box[i * 25 + 5: i * 25 + 5 + 20]
+    boxes_labels = []
+    for boxes in scale:
+        for box in boxes:
+            box_labels = []
+            for i in range( 3 ):
+                pretect_x = box[i * 25]
+                pretect_y = box[i * 25 + 1]
+                pretect_width = box[i * 25 + 2]
+                pretect_height = box[i * 25 + 3]
+                pretect_objectness = box[i * 25 + 4]
+                pretect_class = box[i * 25 + 5: i * 25 + 5 + 20]
 
-            box_label = ( pretect_x, pretect_y, pretect_width, pretect_height, pretect_objectness, pretect_class )
-            box_labels.append( box_label )
+                box_label = ( pretect_x, pretect_y, pretect_width, pretect_height, pretect_objectness, pretect_class )
+                box_labels.append( box_label )
 
-        boxes_label.append( box_labels )
+            boxes_labels.append( box_labels )
 
-    return boxes_label
+    return boxes_labels
 
 def get_bdboxes( boxes_labels ):
     bdboxes = []
@@ -28,16 +29,16 @@ def get_bdboxes( boxes_labels ):
             if box_labels[i][4] > max:
                 index = i
 
-        if box_labels[i][4] >= 0.5:
-            x = boxes_labels[i][0]
-            y = boxes_labels[i][1]
-            width = boxes_labels[i][2]
-            height = boxes_labels[i][3]
-            object_class = get_object_class( boxes_labels[i][5] )
+        if box_labels[i][4] >= 0:
+            x = box_labels[i][0]
+            y = box_labels[i][1]
+            width = box_labels[i][2]
+            height = box_labels[i][3]
+            object_class = get_object_class( box_labels[i][5] )
 
             bdbox = ( x, y, width, height, object_class )
 
-        bdboxes.append( bdbox )
+            bdboxes.append( bdbox )
 
     return bdboxes
 
