@@ -64,7 +64,7 @@ def main( FLAGS ):
         #                             1.2,
         #                             (0, 255, 0),
         #                             2 )
-    output_image = np.multiply( output_image, 255 )
+    # output_image = np.multiply( output_image, 255 )
 
     generate_image = FLAGS.save_dir + '/res.jpg'
     if not os.path.exists( FLAGS.save_dir ):
