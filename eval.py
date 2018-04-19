@@ -59,20 +59,21 @@ def main( FLAGS ):
                                       ( int( bdbox[0] + bdbox[2] / 2 ), int( bdbox[1] + bdbox[3] / 2 ) ),
                                       ( 200, 0, 0 ),
                                       1 )
-        # output_image = cv2.putText( output_image, bdbox[5],
-        #                             ( bdbox[0] - bdbox[2] / 2, bdbox[1] - bdbox[3] / 2 ),
-        #                             1.2,
-        #                             (0, 255, 0),
-        #                             2 )
+        output_image = cv2.putText( output_image,
+                                    bdbox[4],
+                                    ( int( bdbox[0] - bdbox[2] / 2 ), int( bdbox[1] - bdbox[3] / 2 ) ),
+                                    cv2.FONT_HERSHEY_SIMPLEX,
+                                    0.1,
+                                    (0, 255, 0),
+                                    1 )
     # output_image = np.multiply( output_image, 255 )
 
     generate_image = FLAGS.save_dir + '/res.jpg'
     if not os.path.exists( FLAGS.save_dir ):
         os.makedirs( FLAGS.save_dir )
 
-    with open( generate_image, 'wb' ) as img:
-        img.write( output_image )
-        end_time = time.time()
+    cv2.imwrite( generate_image, cv2.cvtColor( output_image, cv2.COLOR_RGB2BGR ) )
+    end_time = time.time()
 
     print( 'Use time: ', end_time - start_time )
 
