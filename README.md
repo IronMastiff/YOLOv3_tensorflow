@@ -1,2 +1,2 @@
 # YOLOv3_tensorflow
-YOLOv3 in tensorflow v1.4     RTR
+YOLOv3 in tensorflow v1.4  is   RTR
