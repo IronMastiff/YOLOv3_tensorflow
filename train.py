@@ -17,11 +17,11 @@ def main( FLAGS ):
 
     scale_width, scale_height = select_things.select_scale( FLAGS.scale, FLAGS.width, FLAGS.height )
     '''--------Creat palceholder--------'''
-    datas, labels = net.create_placeholder( FLAGS.batch_size, FLAGS.width, FLAGS.height, scale_width, scale_height )
+    datas, labels, train = net.create_placeholder( FLAGS.batch_size, FLAGS.width, FLAGS.height, scale_width, scale_height )
 
     '''--------net--------'''
-    pre_scale1, pre_scale2, pre_scale3 = net.feature_extractor( datas )
-    scale1, scale2, scale3 = net.scales( pre_scale1, pre_scale2, pre_scale3 )
+    pre_scale1, pre_scale2, pre_scale3 = net.feature_extractor( datas, train )
+    scale1, scale2, scale3 = net.scales( pre_scale1, pre_scale2, pre_scale3, train )
 
     '''--------get labels_filenames and datas_filenames--------'''
     datas_filenames = reader.images( FLAGS.batch_size, FLAGS.datas_path )
@@ -60,7 +60,7 @@ def main( FLAGS ):
         writer = tf.summary.FileWriter( "logs/", sess.graph )
         number = 0
 
-        saver = tf.train.Saver()
+        saver = tf.train.Saver( max_to_keep = 10 )
         save_path = select_things.select_checkpoint( FLAGS.scale )
         last_checkpoint = tf.train.latest_checkpoint( save_path, 'checkpoint' )
         if last_checkpoint:
@@ -83,7 +83,7 @@ def main( FLAGS ):
 
                 normalize_datas = np.array( normalize_datas )
 
-                _, batch_loss, rs = sess.run( [optimizer, loss, merged], feed_dict = {datas: normalize_datas, labels: train_labels[i]} )
+                _, batch_loss, rs = sess.run( [optimizer, loss, merged], feed_dict = {datas: normalize_datas, labels: train_labels[i], train: True} )
 
                 epoch_loss =+ batch_loss
 
@@ -91,8 +91,10 @@ def main( FLAGS ):
 
             if epoch % 1 == 0:
                 print( 'Cost after epoch %i: %f' % ( epoch + number, epoch_loss ) )
+                name = 'scale' + str( FLAGS.scale ) + '.ckpt'
+                saver.save( sess, os.path.join( save_path, name ), global_step = epoch + number )
 
-            if epoch % 1 == 0:
+            if epoch % 10 == 0:
                 val_loss = tf.cast( 0, tf.float32 )
                 for i in range( len( val_filenames ) ):
                     normalize_datas = []
@@ -105,13 +107,11 @@ def main( FLAGS ):
 
                     normalize_datas = np.array( normalize_datas )
 
-                    batch_loss = sess.run( loss, feed_dict = {datas: normalize_datas, labels: val_labels[i]} )
+                    batch_loss = sess.run( loss, feed_dict = {datas: normalize_datas, labels: val_labels[i], train: False} )
 
                     val_loss =+ batch_loss
 
                 print( 'VAL_Cost after epoch %i: %f' %( epoch + number, val_loss ) )
-                name = 'scale' + str( FLAGS.scale ) + '.ckpt'
-                saver.save( sess, os.path.join( save_path, name ), global_step = epoch + number )
 
 
 
