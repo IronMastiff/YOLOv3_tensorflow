@@ -6,8 +6,9 @@ import skimage.transform
 def create_placeholder( batch_size, width, height, final_width, final_height ):
     X = tf.placeholder( tf.float32, [batch_size, width, height, 3] )
     Y = tf.placeholder( tf.float32, [batch_size, final_width, final_height, 255] )
+    train = tf.placeholder( tf.bool )
 
-    return X, Y
+    return X, Y, train
 
 def create_eval_placeholder( width, height ):
     image = tf.placeholder( tf.float32, [1, width, height, 3] )
@@ -20,7 +21,7 @@ def Leaky_Relu( input, alpha = 0.01 ):
     return output
 
 
-def conv2d( inputs, filters, shape, stride = ( 1, 1 ) ):
+def conv2d( inputs, filters, shape, stride = ( 1, 1 ), training = True ):
     layer = tf.layers.conv2d( inputs,
                               filters,
                               shape,
@@ -28,57 +29,57 @@ def conv2d( inputs, filters, shape, stride = ( 1, 1 ) ):
                               padding = 'SAME',
                               kernel_initializer=tf.truncated_normal_initializer( stddev=0.01 ) )
 
-    layer = tf.layers.batch_normalization( layer, training = True )
+    layer = tf.layers.batch_normalization( layer, training = training )
 
     layer = Leaky_Relu( layer )
 
     return layer
 
 
-def Res_conv2d( inputs, shortcut, filters, shape, stride = ( 1, 1 ) ):
-    conv = conv2d( inputs, filters, shape )
+def Res_conv2d( inputs, shortcut, filters, shape, stride = ( 1, 1 ), training = True ):
+    conv = conv2d( inputs, filters, shape, training = training )
     Res = Leaky_Relu( conv + shortcut )
 
     return Res
 
 
-def feature_extractor( inputs ):
-    layer = conv2d( inputs, 32, [3, 3] )
-    layer = conv2d( layer, 64, [3, 3], ( 2, 2 ) )
+def feature_extractor( inputs, training ):
+    layer = conv2d( inputs, 32, [3, 3], training = training )
+    layer = conv2d( layer, 64, [3, 3], ( 2, 2 ), training = training )
     shortcut = layer
 
-    layer = conv2d( layer, 32, [1, 1] )
-    layer = Res_conv2d( layer, shortcut, 64, [3, 3] )
+    layer = conv2d( layer, 32, [1, 1], training = training )
+    layer = Res_conv2d( layer, shortcut, 64, [3, 3], training = training )
 
-    layer = conv2d( layer, 128, [3, 3], ( 2, 2 ) )
+    layer = conv2d( layer, 128, [3, 3], ( 2, 2 ), training = training )
     shortcut = layer
 
     for _ in range( 2 ):
-        layer = conv2d( layer, 64, [1, 1] )
-        layer = Res_conv2d( layer, shortcut, 128, [3, 3] )
+        layer = conv2d( layer, 64, [1, 1], training = training )
+        layer = Res_conv2d( layer, shortcut, 128, [3, 3], training = training )
 
-    layer = conv2d( layer, 256, [3, 3], ( 2, 2 ) )
+    layer = conv2d( layer, 256, [3, 3], ( 2, 2 ), training = training )
     shortcut = layer
 
     for _ in range( 8 ):
-        layer = conv2d( layer, 128, [1, 1] )
-        layer = Res_conv2d( layer, shortcut, 256, [3, 3] )
+        layer = conv2d( layer, 128, [1, 1], training = training )
+        layer = Res_conv2d( layer, shortcut, 256, [3, 3], training = training )
     pre_scale3 = layer
 
-    layer = conv2d( layer, 512, [3, 3], ( 2, 2 ) )
+    layer = conv2d( layer, 512, [3, 3], ( 2, 2 ), training = training )
     shortcut = layer
 
     for _ in range( 8 ):
-        layer = conv2d( layer, 256, [1, 1] )
-        layer = Res_conv2d( layer, shortcut, 512, [3, 3] )
+        layer = conv2d( layer, 256, [1, 1], training = training )
+        layer = Res_conv2d( layer, shortcut, 512, [3, 3], training = training )
     pre_scale2 = layer
 
-    layer = conv2d( layer, 1024, [3, 3], ( 2, 2 ) )
+    layer = conv2d( layer, 1024, [3, 3], ( 2, 2 ), training = training )
     shortcut = layer
 
     for _ in range( 4 ):
-        layer = conv2d( layer, 512, [1, 1] )
-        layer = Res_conv2d( layer, shortcut, 1024, [3, 3] )
+        layer = conv2d( layer, 512, [1, 1], training = training )
+        layer = Res_conv2d( layer, shortcut, 1024, [3, 3], training = training )
     pre_scale1 = layer
 
     return pre_scale1, pre_scale2, pre_scale3
@@ -90,38 +91,38 @@ def get_layer2x( layer_final, pre_scale ):
 
     return layer2x_add
 
-def scales( layer, pre_scale2, pre_scale3 ):
+def scales( layer, pre_scale2, pre_scale3, training ):
     layer_copy = layer
-    layer = conv2d( layer, 512, [1, 1] )
-    layer = conv2d( layer, 1024, [3, 3] )
-    layer = conv2d(layer, 512, [1, 1])
+    layer = conv2d( layer, 512, [1, 1], training = training )
+    layer = conv2d( layer, 1024, [3, 3], training = training )
+    layer = conv2d(layer, 512, [1, 1], training = training )
     layer_final = layer
-    layer = conv2d(layer, 1024, [3, 3])
+    layer = conv2d(layer, 1024, [3, 3], training = training )
 
     '''--------scale_1--------'''
-    scale_1 = conv2d( layer, 255, [1, 1] )
+    scale_1 = conv2d( layer, 255, [1, 1], training = training )
 
     '''--------scale_2--------'''
-    layer = conv2d( layer_final, 256, [1, 1] )
+    layer = conv2d( layer_final, 256, [1, 1], training = training )
     layer = get_layer2x( layer, pre_scale2 )
 
-    layer = conv2d( layer, 256, [1, 1] )
-    layer= conv2d( layer, 512, [3, 3] )
-    layer = conv2d( layer, 256, [1, 1] )
-    layer = conv2d( layer, 512, [3, 3] )
-    layer = conv2d( layer, 256, [1, 1] )
+    layer = conv2d( layer, 256, [1, 1], training = training )
+    layer= conv2d( layer, 512, [3, 3], training = training )
+    layer = conv2d( layer, 256, [1, 1], training = training )
+    layer = conv2d( layer, 512, [3, 3], training = training )
+    layer = conv2d( layer, 256, [1, 1], training = training )
     layer_final = layer
-    layer = conv2d( layer, 512, [3, 3] )
-    scale_2 = conv2d( layer, 255, [1, 1] )
+    layer = conv2d( layer, 512, [3, 3], training = training )
+    scale_2 = conv2d( layer, 255, [1, 1], training = training )
 
     '''--------scale_3--------'''
-    layer = conv2d( layer_final, 128, [1, 1] )
+    layer = conv2d( layer_final, 128, [1, 1], training = training )
     layer = get_layer2x( layer, pre_scale3 )
 
     for _ in range( 3 ):
-        layer = conv2d( layer, 128, [1, 1] )
-        layer = conv2d( layer, 256, [3, 3] )
-    scale_3 = conv2d( layer, 255, [1, 1] )
+        layer = conv2d( layer, 128, [1, 1], training = training )
+        layer = conv2d( layer, 256, [3, 3], training = training )
+    scale_3 = conv2d( layer, 255, [1, 1], training = training )
 
     scale_1 = tf.abs( scale_1 )
     scale_2 = tf.abs( scale_2 )
