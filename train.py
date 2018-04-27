@@ -89,6 +89,7 @@ def main( FLAGS ):
 
             writer.add_summary( rs, epoch + number )
 
+
             if epoch % 1 == 0:
                 print( 'Cost after epoch %i: %f' % ( epoch + number, epoch_loss ) )
                 name = 'scale' + str( FLAGS.scale ) + '.ckpt'
