@@ -25,8 +25,8 @@ def main( FLAGS ):
     image = net.create_eval_placeholder( FLAGS.image_width, FLAGS.image_height )
 
     '''--------net--------'''
-    pre_scale1, pre_scale2, pre_scale3 = net.feature_extractor( image )
-    scale1, scale2, scale3 = net.scales( pre_scale1, pre_scale2, pre_scale3 )
+    pre_scale1, pre_scale2, pre_scale3 = net.feature_extractor( image, False )
+    scale1, scale2, scale3 = net.scales( pre_scale1, pre_scale2, pre_scale3, False )
 
     with tf.Session() as sess:
         saver = tf.train.Saver()
@@ -63,7 +63,7 @@ def main( FLAGS ):
                                     bdbox[4],
                                     ( int( bdbox[0] - bdbox[2] / 2 ), int( bdbox[1] - bdbox[3] / 2 ) ),
                                     cv2.FONT_HERSHEY_SIMPLEX,
-                                    0.1,
+                                    0.3,
                                     (0, 255, 0),
                                     1 )
     # output_image = np.multiply( output_image, 255 )

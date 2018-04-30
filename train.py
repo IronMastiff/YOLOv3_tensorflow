@@ -49,7 +49,9 @@ def main( FLAGS ):
         loss = get_loss.calculate_loss( scale3, labels )
 
     '''--------Optimizer--------'''
-    optimizer = tf.train.AdamOptimizer( learning_rate=FLAGS.learning_rate ).minimize( loss )
+    update_ops = tf.get_collection( tf.GraphKeys.UPDATE_OPS )
+    with tf.control_dependencies( update_ops ):
+        optimizer = tf.train.AdamOptimizer( learning_rate=FLAGS.learning_rate ).minimize( loss )
 
     tf.summary.scalar( 'loss',  loss )
     merged = tf.summary.merge_all()
@@ -90,12 +92,12 @@ def main( FLAGS ):
             writer.add_summary( rs, epoch + number )
 
 
-            if epoch % 1 == 0:
+            if epoch % 1 == 0 & epoch != 0:
                 print( 'Cost after epoch %i: %f' % ( epoch + number, epoch_loss ) )
                 name = 'scale' + str( FLAGS.scale ) + '.ckpt'
                 saver.save( sess, os.path.join( save_path, name ), global_step = epoch + number )
 
-            if epoch % 10 == 0:
+            if epoch % 10 == 0 & epoch != 0:
                 val_loss = tf.cast( 0, tf.float32 )
                 for i in range( len( val_filenames ) ):
                     normalize_datas = []
