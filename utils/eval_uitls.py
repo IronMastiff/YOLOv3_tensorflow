@@ -27,9 +27,10 @@ def get_bdboxes( boxes_labels ):
         max = 0
         for i in range( 3 ):
             if box_labels[i][4] > max:
+                max = box_labels[i][4]
                 index = i
 
-        if box_labels[i][4] >= 0:
+            # if box_labels[i][4] >= 0.1:
             x = box_labels[i][0]
             y = box_labels[i][1]
             width = box_labels[i][2]
@@ -47,7 +48,9 @@ def get_object_class( input ):
     index = 0
     for i in range( len( input ) ):
         if input[i] > max:
+            max = input[i]
             index = i
+    index = index + 5
 
     class_map = {
         5 : 'person',
