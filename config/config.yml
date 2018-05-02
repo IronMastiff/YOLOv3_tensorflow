@@ -1,6 +1,6 @@
 ## Basic config
 batch_size: 2
-learning_rate: 0.0001
+learning_rate: 0.001
 epoch: 1000
 
 ## reset image size

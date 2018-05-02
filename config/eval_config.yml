@@ -8,5 +8,5 @@ scale: 1
 save_dir: './generated_images'
 
 # Out put image attribute
-image_width: 512
-image_height: 512
+image_width: 128
+image_height: 128
